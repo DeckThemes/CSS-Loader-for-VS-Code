@@ -10,6 +10,9 @@
     "name": "Travis Lane (Tormak)",
     "email": "Tormak9970@gmail.com"
   },
+  "bugs": {
+    "url": "https://github.com/DeckThemes/CSS-Loader-for-VS-Code/issues"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
