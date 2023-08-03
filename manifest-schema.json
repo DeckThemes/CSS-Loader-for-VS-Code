@@ -3,6 +3,20 @@
   "title": "Theme Manifest",
   "description": "The manifest file for a CSS Loader Theme.",
   "type": "object",
+  "default": {
+    "name": "A New, Awesome Theme!",
+    "description": "Something to spice up your Steamdeck experience!",
+    "author": "You",
+    "version": "v1.0.0",
+    "manifest_version": 8,
+    "target": "Home",
+    "tabs": {
+      "default": [ "bigpicture" ]
+    },
+    "inject": {
+      "shared.css": []
+    }
+  },
   "properties": {
     "$schema": {
       "description": "The JSON schema for a CSS Loader Theme Manifest.",
