@@ -1,8 +1,7 @@
-import * as vscode from 'vscode';
 import * as path from "path";
 import * as fs from 'fs';
-import axios from "axios";
 import { homedir } from "os";
+import { ConfigurationTarget, ExtensionContext, WorkspaceConfiguration, workspace } from "vscode";
 
 const logoSvg = `
 <svg width="512" height="512" viewBox="0 0 420 420" fill="none" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -20,13 +19,27 @@ const logoSvg = `
 </svg>
 `;
 
+// This method is called when your extension is activated
+// Your extension is activated the very first time the command is executed
+export function activate(context: ExtensionContext) {
+	console.log('Congratulations, your extension "css-loader-for-vs-code" is now active!');
+
+  setMaterialIconAssociation();
+}
+
+// This method is called when your extension is deactivated
+export function deactivate() {
+  // TODO: remove the icon and file association here
+}
+
+
 const applySettings = (settings: any) => {
   if (!settings) {
     return // no settings, nothing to do
   }
-  const workspaceSettings = vscode.workspace.getConfiguration()
+  const workspaceSettings = workspace.getConfiguration()
   Object.keys(settings).forEach((k) => {
-    workspaceSettings.update(k, settings[k], vscode.ConfigurationTarget.Global).then(undefined, (reason) => {
+    workspaceSettings.update(k, settings[k], ConfigurationTarget.Global).then(undefined, (reason) => {
       console.log(
         `You tried to apply \`${ k }: ${ settings[k] }\` but this is not a valid VS Code settings
           key/value pair.`
@@ -35,15 +48,9 @@ const applySettings = (settings: any) => {
   })
 }
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-  registerSchemasHandler(context);
-
-	console.log('Congratulations, your extension "css-loader-for-vs-code" is now active!');
-
-	const materialUIConfiguration = vscode.workspace.getConfiguration('material-icon-theme');
-	const fileConfiguration: vscode.WorkspaceConfiguration = materialUIConfiguration.get('files')!;
+function setMaterialIconAssociation() {
+  const materialUIConfiguration = workspace.getConfiguration('material-icon-theme');
+	const fileConfiguration: WorkspaceConfiguration = materialUIConfiguration.get('files')!;
   const associations: any = fileConfiguration.associations;
   const cleaned = JSON.parse(JSON.stringify(associations));
 
@@ -61,26 +68,4 @@ export function activate(context: vscode.ExtensionContext) {
   
   if (!fs.existsSync(iconsDir)) fs.mkdirSync(iconsDir);
   if (!fs.existsSync(iconpath)) fs.writeFileSync(iconpath, logoSvg);
-}
-
-// This method is called when your extension is deactivated
-export function deactivate() {}
-
-function registerSchemasHandler(context: vscode.ExtensionContext) {
-  vscode.workspace.registerTextDocumentContentProvider(
-    'css-loader',
-    new (class implements vscode.TextDocumentContentProvider {
-      onDidChangeEmitter = new vscode.EventEmitter<vscode.Uri>();
-      onDidChange = this.onDidChangeEmitter.event;
-
-      async provideTextDocumentContent(uri: vscode.Uri): Promise<string> {
-        if (uri.authority === 'schemas' && uri.path === '/theme.json') {
-          const res = await axios.get(`https://raw.githubusercontent.com/DeckThemes/CSS-Loader-for-VS-Code/main/schema.json`);
-          return res.status == 200 ? JSON.stringify(res.data) : '';
-        }
-
-        return '';
-      }
-    })()
-  );
 }
