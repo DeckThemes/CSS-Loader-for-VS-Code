@@ -28,22 +28,111 @@
       "type": "string"
     },
     "manifest_version": {
-      
+      "description": "The manifest version. This should almost always be the latest version.\n\nLatest Version: 8",
+      "type": "integer"
     },
     "target": {
-
+      "description": "The Theme's target. This helps users tell what the Theme styles at a glance.",
+      "enum": [
+        "System-Wide",
+        "Keyboard",
+        "Home",
+        "Background",
+        "Library",
+        "Store",
+        "Friends and Chat",
+        "Media",
+        "Downloads",
+        "Settings",
+        "Lock Screen",
+        "Tweak",
+        "Other",
+        "Desktop"
+      ]
     },
     "tabs": {
-
+      "description": "A dictionary of reuseable injection targets, where the key is the label, and the value is an array of injection targets.",
+      "type": "object",
+      "properties": {
+        "default": {
+          "description": "The default injection target. This is used when a file's injection target is \"[]\"."  
+        }
+      },
+      "patternProperties": {
+        ".*": {
+          "$ref": "#/definitions/TabTarget"
+        }
+      }
     },
     "inject": {
-
+      "description": "A dictionary of files to inject, where the key is the relative path to the .css file, and the value is an array of injection targets.",
+      "type": "object",
+      "patternProperties": {
+        ".*": {
+          "$ref": "#/definitions/InjectionTarget"
+        }
+      }
     },
     "dependencies": {
 
     },
     "patches": {
-      
+
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "TabTarget": {
+      "description": "A reuseable injection target.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/InjectionTargets"
+      }
+    },
+    "InjectionTarget": {
+      "description": "A file to inject into Steam. The path should be relative to the theme.json file, with preceding '.' and '/' removed.",
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/definitions/InjectionTargets"
+      }
+    },
+    "InjectionTargets": {
+      "anyOf": [
+        {
+          "description": "A predefined injection target resolved by CSS Loader.",
+          "enum": [
+            ".*",
+            "desktop",
+            "desktopchat",
+            "desktoppopup",
+            "desktopoverlay",
+            "desktopcontextmenu",
+            "bigpicture",
+            "bigpictureoverlay",
+            "store"
+          ]
+        },
+        {
+          "description": "A legacy injection target. These should be avoided in new Themes, but are fine to leave in old ones.",
+          "enum": [
+            "SP",
+            "Steam Big Picture Mode",
+            "MainMenu",
+            "MainMenu_.*",
+            "QuickAccess",
+            "QuickAccess_.*",
+            "Steam",
+            "SteamLibraryWindow",
+            "All"
+          ]
+        },
+        {
+          "description": "A custom injection target. This is typically a key defined in \"tabs\", a tab url, or regex expression.",
+          "type": "string"
+        }
+      ]
     }
   }
 }
