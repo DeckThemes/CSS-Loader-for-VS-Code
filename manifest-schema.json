@@ -88,12 +88,34 @@
       }
     },
     "dependencies": {
-
+      "description": "A dictionary of other Themes that will be installed if not present along with this Theme.",
+      "type": "object",
+      "patternProperties": {
+        ".*": {
+          "description": "A dependency of this Theme. Can be configured to set patch values that will override the defaults.",
+          "type": "object",
+          "patternProperties": {
+            ".*": {
+              "description": "An override for patch.",
+              "type": "string"
+            }
+          }
+        }
+      }
     },
     "patches": {
 
     }
   },
+  "required": [
+    "name",
+    "description",
+    "author",
+    "version",
+    "manifest_version",
+    "target",
+    "inject"
+  ],
   "additionalProperties": false,
   "definitions": {
     "TabTarget": {
@@ -147,6 +169,30 @@
           "type": "string"
         }
       ]
+    },
+    "Patch": {
+
+    },
+    "TogglePatch": {
+
+    },
+    "DropdownPatch": {
+
+    },
+    "SliderPatch": {
+
+    },
+    "ImagePatch": {
+
+    },
+    "ColorPatch": {
+
+    },
+    "PatchOptions": {
+
+    },
+    "PatchOption": {
+
     }
   }
 }
