@@ -56,10 +56,11 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run compile",
-    "compile": "tsc -p ./ && vite build",
-    "watch": "vite build --watch",
-    "pretest": "pnpm run compile && pnpm run lint",
+    "vscode:prepublish": "pnpm run build",
+    "build": "vite build",
+    "vite-watch": "vite build --watch",
+    "watch": "tsc -watch -p ./",
+    "pretest": "pnpm run build && pnpm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },

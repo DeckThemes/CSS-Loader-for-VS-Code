@@ -18,7 +18,6 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       external: ['vscode', 'os', 'fs', 'path'],
-    },
-    minify: false
+    }
   },
 });
