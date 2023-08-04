@@ -4,8 +4,13 @@
   "description": "Enhances the CSS Loader theme dev experience.",
   "version": "v1.0.0",
   "icon": "./assets/logo_128x128.png",
-  "galleryBanner": {},
+  "galleryBanner": {
+    "color": "#0d0f11",
+    "theme": "dark"
+  },
+  "homepage": "https://deckthemes.com",
   "repository": "https://github.com/DeckThemes/CSS-Loader-VSCode",
+  "publisher": "DeckThemes",
   "author": {
     "name": "Travis Lane (Tormak)",
     "email": "Tormak9970@gmail.com"
@@ -17,6 +22,8 @@
     "vscode": "^1.80.0"
   },
   "categories": [
+    "Programming Languages",
+    "Linters",
     "Other"
   ],
   "keywords": [
@@ -26,7 +33,13 @@
     "steam",
     "steam deck"
   ],
-  "badges": [],
+  "badges": [
+    {
+      "description": "A link to the DeckThemes discord, for help with working on themes.",
+      "href": "https://discord.gg/W5tHyE6GEY",
+      "url": "https://badgen.net/discord/members/W5tHyE6GEY"
+    }
+  ],
   "activationEvents": [
     "workspaceContains:**/theme.json"
   ],
