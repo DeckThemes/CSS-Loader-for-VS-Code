@@ -43,7 +43,7 @@
     },
     "manifest_version": {
       "description": "The manifest version. This should almost always be the latest version.\n\nLatest Version: 8",
-      "type": "integer"
+      "const": 8
     },
     "target": {
       "description": "The Theme's target. This helps users tell what the Theme styles at a glance.",
@@ -89,7 +89,7 @@
       "description": "A dictionary of files and css variables to inject.\n\nFor files, the key should be the relative path to the .css file, and the value is an array of injection targets.\n\nFor css variables, the key should be the variable name (including the --), and the value should be an array of injection targets, with index 0 being the variable's value.",
       "type": "object",
       "patternProperties": {
-        ".*": {
+        "^(\\-\\-[a-z0-9\\-\\_]+)|.*\\.css$": {
           "$ref": "#/definitions/InjectionTarget"
         }
       }
@@ -384,7 +384,7 @@
         "css_variable": {
           "description": "The name of the css variable this component should use to store its value.",
           "type": "string",
-          "pattern": "^([a-z0-9\\-\\_]+)$"
+          "pattern": "^(\\-\\-[a-z0-9\\-\\_]+)$"
         },
         "tabs": {
           "description": "The injection targets for this component.",
@@ -421,7 +421,7 @@
         "css_variable": {
           "description": "The name of the css variable this component should use to store its value.",
           "type": "string",
-          "pattern": "^([a-z0-9\\-\\_]+)$"
+          "pattern": "^(\\-\\-[a-z0-9\\-\\_]+)$"
         },
         "tabs": {
           "description": "The injection targets for this component.",
