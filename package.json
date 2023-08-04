@@ -11,6 +11,7 @@
   "homepage": "https://deckthemes.com",
   "repository": "https://github.com/DeckThemes/CSS-Loader-VSCode",
   "publisher": "DeckThemes",
+  "license": "LGPL-3.0-or-later",
   "author": {
     "name": "Travis Lane (Tormak)",
     "email": "Tormak9970@gmail.com"
