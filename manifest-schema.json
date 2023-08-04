@@ -119,8 +119,7 @@
     "author",
     "version",
     "manifest_version",
-    "target",
-    "inject"
+    "target"
   ],
   "additionalProperties": false,
   "definitions": {
