@@ -363,7 +363,7 @@
         "css_variable": {
           "description": "The name of the css variable this component should use to store its value.",
           "type": "string",
-          "pattern": "^([a-z0-9\\-]+)$"
+          "pattern": "^([a-z0-9\\-\\_]+)$"
         },
         "tabs": {
           "description": "The injection targets for this component.",
@@ -400,7 +400,7 @@
         "css_variable": {
           "description": "The name of the css variable this component should use to store its value.",
           "type": "string",
-          "pattern": "^([a-z0-9\\-]+)$"
+          "pattern": "^([a-z0-9\\-\\_]+)$"
         },
         "tabs": {
           "description": "The injection targets for this component.",
