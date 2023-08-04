@@ -29,7 +29,7 @@ export function activate(context: ExtensionContext) {
 
 // This method is called when your extension is deactivated
 export function deactivate() {
-  // TODO: remove the icon and file association here
+  removeMaterialIconAssociation();
 }
 
 
@@ -56,6 +56,28 @@ function setMaterialIconAssociation() {
 
   if (!Object.keys(cleaned).includes("theme.json")) {
     cleaned['theme.json'] = "../../icons/cssloader";
+
+    applySettings({
+      "material-icon-theme.files.associations": { ...cleaned }
+    });
+  }
+
+  const extensionsDir = path.join(homedir(), ".vscode", "extensions");
+  const iconsDir = path.join(extensionsDir, "icons");
+  const iconpath = path.join(iconsDir, "cssloader.svg");
+  
+  if (!fs.existsSync(iconsDir)) fs.mkdirSync(iconsDir);
+  if (!fs.existsSync(iconpath)) fs.writeFileSync(iconpath, logoSvg);
+}
+
+function removeMaterialIconAssociation() {
+  const materialUIConfiguration = workspace.getConfiguration('material-icon-theme');
+	const fileConfiguration: WorkspaceConfiguration = materialUIConfiguration.get('files')!;
+  const associations: any = fileConfiguration.associations;
+  const cleaned = JSON.parse(JSON.stringify(associations));
+
+  if (Object.keys(cleaned).includes("theme.json")) {
+    delete cleaned['theme.json'];
 
     applySettings({
       "material-icon-theme.files.associations": { ...cleaned }
