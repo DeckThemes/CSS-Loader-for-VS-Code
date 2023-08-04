@@ -4,7 +4,7 @@
   "description": "The manifest file for a CSS Loader Theme.",
   "type": "object",
   "default": {
-    "name": "A New, Awesome Theme!",
+    "name": "An Awesome Theme",
     "description": "Something to spice up your Steamdeck experience!",
     "author": "You",
     "version": "v1.0.0",
@@ -104,7 +104,13 @@
       }
     },
     "patches": {
-
+      "description": "A dictionary of options for this Theme, where the key is the option's name, and the value is a patch.",
+      "type": "object",
+      "patternProperties": {
+        ".*": {
+          "$ref": "#/definitions/Patch"
+        }
+      }
     }
   },
   "required": [
@@ -171,28 +177,115 @@
       ]
     },
     "Patch": {
-
+      "description": "A patch for this Theme. Allows users to configure parts of the Theme.",
+      "oneOf": [
+        { "$ref": "#/definitions/TogglePatch" },
+        { "$ref": "#/definitions/DropdownPatch" },
+        { "$ref": "#/definitions/SliderPatch" }
+      ]
     },
     "TogglePatch": {
-
+      "properties": {
+        "components": {
+          "$ref": "#/definitions/Components"
+        }
+      }
     },
     "DropdownPatch": {
-
+      "properties": {
+        "components": {
+          "$ref": "#/definitions/Components"
+        }
+      }
     },
     "SliderPatch": {
-
+      "properties": {
+        "components": {
+          "$ref": "#/definitions/Components"
+        }
+      }
     },
-    "ImagePatch": {
-
+    "Components": {
+      "description": "An array of components used in this Theme.",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          { "$ref": "#/definitions/ImageComponent" }, 
+          { "$ref": "#/definitions/ColorComponent" } 
+        ]
+      }
     },
-    "ColorPatch": {
-
+    "ImageComponent": {
+      "description": "A component for allowing the user to pick an image.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the patch this component should be associated with.",
+          "type": "string"
+        },
+        "type": {
+          "description": "The type of the component.",
+          "const": "image-picker"
+        },
+        "on": {
+          "description": "The value of the patch that should show this component.",
+          "type": "string"
+        },
+        "default": {
+          "description": "The default value of the image picker. Should be a file path starting with the name of this Theme.\n\nExample: \"An Awesome Theme/default-image.png\"",
+          "type": "string",
+          "pattern": "^(?:[\\w]\\:|\\\\)(\\\\[a-z_\\-\\s0-9\\.]+)+\\.(png|apng|jpg|jpeg|webp|gif)$"
+        },
+        "css_variable": {
+          "description": "The name of the css variable this component should use to store its value.",
+          "type": "string",
+          "pattern": "^([a-z0-9\\-]+)$"
+        },
+        "tabs": {
+          "description": "The injection targets for this component.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/InjectionTargets"
+          }
+        }
+      }
     },
-    "PatchOptions": {
-
-    },
-    "PatchOption": {
-
+    "ColorComponent": {
+      "description": "A component for allowing the user to set a color.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the patch this component should be associated with.",
+          "type": "string"
+        },
+        "type": {
+          "description": "The type of the component.",
+          "const": "color-picker"
+        },
+        "on": {
+          "description": "The value of the patch that should show this component.",
+          "type": "string"
+        },
+        "default": {
+          "description": "The default value of the color picker. Should be in hexadecimal form.\n\nExample: \"#59BF40\"",
+          "type": "string",
+          "pattern": "^#([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+        },
+        "css_variable": {
+          "description": "The name of the css variable this component should use to store its value.",
+          "type": "string",
+          "pattern": "^([a-z0-9\\-]+)$"
+        },
+        "tabs": {
+          "description": "The injection targets for this component.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/InjectionTargets"
+          }
+        }
+      }
     }
   }
 }
