@@ -49,19 +49,26 @@
       "description": "The Theme's target. This helps users tell what the Theme styles at a glance.",
       "enum": [
         "System-Wide",
-        "Keyboard",
         "Home",
-        "Background",
         "Library",
         "Store",
         "Friends and Chat",
+        "Tweak",
+        "Keyboard",
+        "Other",
+        "Preset",
+        "Snippet",
         "Media",
+        "Lock Screen",
+        "Background",
         "Downloads",
         "Settings",
-        "Lock Screen",
-        "Tweak",
-        "Other",
-        "Desktop"
+
+        "Desktop",
+        "Desktop-Library",
+        "Desktop-Store",
+        "Desktop-Friends",
+        "Desktop-Tweak"
       ]
     },
     "tabs": {
