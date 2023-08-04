@@ -193,20 +193,23 @@
               "description": "The type of this patch.",
               "const": "none"
             },
+            "default": {
+              "description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
+              "type": "string"
+            },
             "values": {
               "description": "Should be a dictionary with a \"_\" prop.",
               "type": "object",
-              "properties": {
-                "_": {
+              "patternProperties": {
+                ".*": {
                   "description": "An empty dictionary.",
                   "type": "object",
                   "properties": {},
                   "additionalItems": false
                 }
               },
-              "required": [
-                "_"
-              ]
+              "minProperties": 1,
+              "maxProperties": 1
             },
             "components": {
               "$ref": "#/definitions/Components"
@@ -230,6 +233,10 @@
         "type": {
           "description": "The type of this patch.",
           "const": "checkbox"
+        },
+        "default": {
+          "description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
+          "type": "string"
         },
         "values": {
           "description": "The values for this patch.",
@@ -277,6 +284,10 @@
           "description": "The type of this patch.",
           "const": "dropdown"
         },
+        "default": {
+          "description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
+          "type": "string"
+        },
         "values": {
           "description": "The values for this dropdown. These are typically words, as otherwise a slider is a better solution.",
           "type": "object",
@@ -309,6 +320,10 @@
         "type": {
           "description": "The type of this patch.",
           "const": "slider"
+        },
+        "default": {
+          "description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
+          "type": "string"
         },
         "values": {
           "description": "The values for this slider. These are typically numbers, as otherwise a dropdown is a better solution.",
