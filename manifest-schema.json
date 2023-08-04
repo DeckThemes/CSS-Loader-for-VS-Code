@@ -187,10 +187,29 @@
               "description": "The type of this patch.",
               "const": "none"
             },
+            "values": {
+              "description": "Should be a dictionary with a \"_\" prop.",
+              "type": "object",
+              "properties": {
+                "_": {
+                  "description": "An empty dictionary.",
+                  "type": "object",
+                  "properties": {},
+                  "additionalItems": false
+                }
+              },
+              "required": [
+                "_"
+              ]
+            },
             "components": {
               "$ref": "#/definitions/Components"
             }
           },
+          "required": [
+            "type",
+            "values"
+          ],
           "additionalItems": false
         },
         { "$ref": "#/definitions/TogglePatch" },
@@ -255,7 +274,7 @@
         "values": {
           "description": "The values for this dropdown. These are typically words, as otherwise a slider is a better solution.",
           "type": "object",
-          "properties": {
+          "patternProperties": {
             ".*": {
               "description": "A dictionary of files and css variables to inject when this option is selected.",
               "type": "object",
@@ -288,7 +307,7 @@
         "values": {
           "description": "The values for this slider. These are typically numbers, as otherwise a dropdown is a better solution.",
           "type": "object",
-          "properties": {
+          "patternProperties": {
             ".*": {
               "description": "A dictionary of files and css variables to inject when this option is selected.",
               "type": "object",
