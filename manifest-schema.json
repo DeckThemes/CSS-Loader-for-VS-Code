@@ -79,7 +79,7 @@
       }
     },
     "inject": {
-      "description": "A dictionary of files to inject, where the key is the relative path to the .css file, and the value is an array of injection targets.",
+      "description": "A dictionary of files and css variables to inject.\n\nFor files, the key should be the relative path to the .css file, and the value is an array of injection targets.\n\nFor css variables, the key should be the variable name (including the --), and the value should be an array of injection targets, with index 0 being the variable's value.",
       "type": "object",
       "patternProperties": {
         ".*": {
@@ -171,7 +171,7 @@
           ]
         },
         {
-          "description": "A custom injection target. This is typically a key defined in \"tabs\", a tab url, or regex expression.",
+          "description": "A custom injection target or variable value. This is typically a key defined in \"tabs\", a tab url, a regex expression, or the value of a variable.",
           "type": "string"
         }
       ]
@@ -179,31 +179,136 @@
     "Patch": {
       "description": "A patch for this Theme. Allows users to configure parts of the Theme.",
       "oneOf": [
+        {
+          "description": "A generic patch, used for perminantly showing a component.",
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "The type of this patch.",
+              "const": "none"
+            },
+            "components": {
+              "$ref": "#/definitions/Components"
+            }
+          },
+          "additionalItems": false
+        },
         { "$ref": "#/definitions/TogglePatch" },
         { "$ref": "#/definitions/DropdownPatch" },
         { "$ref": "#/definitions/SliderPatch" }
       ]
     },
     "TogglePatch": {
+      "description": "A patch for letting users toggle part of the Theme on/off.",
+      "type": "object",
       "properties": {
+        "type": {
+          "description": "The type of this patch.",
+          "const": "checkbox"
+        },
+        "values": {
+          "description": "The values for this patch.",
+          "type": "object",
+          "properties": {
+            "Yes": {
+              "description": "A dictionary of files and css variables to inject when the checkbox is checked.",
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/InjectionTarget"
+                }
+              }
+            },
+            "No": {
+              "description": "A dictionary of files and css variables to inject when the checkbox is not checked.",
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/InjectionTarget"
+                }
+              }
+            }
+          },
+          "required": [
+            "Yes",
+            "No"
+          ]
+        },
         "components": {
           "$ref": "#/definitions/Components"
         }
-      }
+      },
+      "required": [
+        "type",
+        "values"
+      ],
+      "additionalItems": false
     },
     "DropdownPatch": {
+      "description": "A patch for letting users select an option from a predefined list.",
+      "type": "object",
       "properties": {
+        "type": {
+          "description": "The type of this patch.",
+          "const": "dropdown"
+        },
+        "values": {
+          "description": "The values for this dropdown. These are typically words, as otherwise a slider is a better solution.",
+          "type": "object",
+          "properties": {
+            ".*": {
+              "description": "A dictionary of files and css variables to inject when this option is selected.",
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/InjectionTarget"
+                }
+              }
+            }
+          }
+        },
         "components": {
           "$ref": "#/definitions/Components"
         }
-      }
+      },
+      "required": [
+        "type",
+        "values"
+      ],
+      "additionalItems": false
     },
     "SliderPatch": {
+      "description": "A patch for letting users choose values in an interval.",
+      "type": "object",
       "properties": {
+        "type": {
+          "description": "The type of this patch.",
+          "const": "slider"
+        },
+        "values": {
+          "description": "The values for this slider. These are typically numbers, as otherwise a dropdown is a better solution.",
+          "type": "object",
+          "properties": {
+            ".*": {
+              "description": "A dictionary of files and css variables to inject when this option is selected.",
+              "type": "object",
+              "patternProperties": {
+                ".*": {
+                  "$ref": "#/definitions/InjectionTarget"
+                }
+              }
+            }
+          }
+        },
         "components": {
           "$ref": "#/definitions/Components"
         }
-      }
+      },
+      "required": [
+        "type",
+        "values"
+      ],
+      "additionalItems": false
     },
     "Components": {
       "description": "An array of components used in this Theme.",
@@ -249,7 +354,8 @@
             "$ref": "#/definitions/InjectionTargets"
           }
         }
-      }
+      },
+      "additionalItems": false
     },
     "ColorComponent": {
       "description": "A component for allowing the user to set a color.",
@@ -285,7 +391,8 @@
             "$ref": "#/definitions/InjectionTargets"
           }
         }
-      }
+      },
+      "additionalItems": false
     }
   }
 }
