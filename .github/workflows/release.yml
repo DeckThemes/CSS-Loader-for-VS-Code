@@ -68,6 +68,11 @@ jobs:
         with:
           node-version: 16
 
+      - name: Setup Pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8.6.11
+
       - name: Publish to Visual Studio Marketplace
         id: publish-extension
         uses: HaaLeo/publish-vscode-extension@v1
