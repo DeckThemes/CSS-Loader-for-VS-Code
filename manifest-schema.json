@@ -26,49 +26,59 @@
       ]
     },
     "name": {
-      "description": "The name of the Theme. Make it short and catchy!",
+      "description": "The name of the theme. Make it short and catchy!",
       "type": "string"
     },
     "description": {
-      "description": "A description of the Theme. This should explain what it does, and any side effects it has (breaks navigation, etc), as well as any incompatabilities with other themes.",
+      "description": "A description of the theme. This should explain what it does, and any side effects it has (breaks navigation, etc), as well as any incompatabilities with other themes.",
       "type": "string"
     },
     "author": {
-      "description": "The author of the Theme. Can be a discord tag, or just your name/username",
+      "description": "The author of the theme. Can be a discord tag, or just your name/username",
       "type": "string"
     },
     "version": {
-      "description": "The version of the Theme. It should follow Semantic Versioning.\n\nSemVer reference: https://docs.npmjs.com/about-semantic-versioning",
+      "description": "The version of the theme. It should follow Semantic Versioning.\n\nSemVer reference: https://docs.npmjs.com/about-semantic-versioning",
       "type": "string"
     },
     "manifest_version": {
       "description": "The manifest version. This should almost always be the latest version.\n\nLatest Version: 8",
       "const": 8
     },
+    "flags": {
+      "description": "A list of flags that modify the behavior of the theme.",
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "description": "A flag that modifies the behavior of the theme.",
+            "enum": [
+              "PRESET",
+              "KEEP_DEPENDENCIES",
+              "OPTIONAL_DEPENDENCIES"
+            ]
+          }
+        ]
+      },
+      "uniqueItems": true
+    },
     "target": {
-      "description": "The Theme's target. This helps users tell what the Theme styles at a glance.",
-      "enum": [
-        "System-Wide",
-        "Home",
-        "Library",
-        "Store",
-        "Friends and Chat",
-        "Tweak",
-        "Keyboard",
-        "Other",
-        "Preset",
-        "Snippet",
-        "Media",
-        "Lock Screen",
-        "Background",
-        "Downloads",
-        "Settings",
-
-        "Desktop",
-        "Desktop-Library",
-        "Desktop-Store",
-        "Desktop-Friends",
-        "Desktop-Tweak"
+      "anyOf": [
+        {
+          "$ref": "#/definitions/ThemeTarget"
+        },
+        {
+          "description": "An array of theme targets. These helps users tell what the theme styles at a glance.",
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/ThemeTarget"
+              }
+            ]
+          },
+          "uniqueItems": true
+        }
       ]
     },
     "tabs": {
@@ -95,23 +105,51 @@
       }
     },
     "dependencies": {
-      "description": "A dictionary of other Themes that will be installed if not present along with this Theme.",
+      "description": "A dictionary of other themes that will be installed if not present along with this theme.",
       "type": "object",
       "patternProperties": {
         ".*": {
-          "description": "A dependency of this Theme. Can be configured to set patch values that will override the defaults.",
+          "description": "A dependency of this theme. Can be configured to set patch values that will override the defaults.",
           "type": "object",
           "patternProperties": {
             ".*": {
-              "description": "An override for patch.",
-              "type": "string"
+              "anyOf": [
+                {
+                  "description": "An override for a patch.",
+                  "type": "string"
+                },
+                {
+                  "description": "An override for a patch.",
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "description": "The override value.",
+                      "type": "string"
+                    },
+                    "components": {
+                      "description": "A dictionary of this patch's components to override.",
+                      "type": "object",
+                      "patternProperties": {
+                        ".*": {
+                          "description": "A component of this patch to override.",
+                          "type": "string"
+                        }
+                      }
+                    }
+                  },
+                  "required": [
+                    "value",
+                    "components"
+                  ]
+                }
+              ]
             }
           }
         }
       }
     },
     "patches": {
-      "description": "A dictionary of options for this Theme, where the key is the option's name, and the value is a patch.",
+      "description": "A dictionary of options for this theme, where the key is the option's name, and the value is a patch.",
       "type": "object",
       "patternProperties": {
         ".*": {
@@ -130,6 +168,32 @@
   ],
   "additionalProperties": false,
   "definitions": {
+    "ThemeTarget": {
+      "description": "A theme target. This helps users tell what the theme styles at a glance.",
+      "enum": [
+        "System-Wide",
+        "Home",
+        "Library",
+        "Store",
+        "Friends and Chat",
+        "Tweak",
+        "Keyboard",
+        "Other",
+        "Preset",
+        "Snippet",
+        "Media",
+        "Lock Screen",
+        "Background",
+        "Downloads",
+        "Settings",
+
+        "Desktop",
+        "Desktop-Library",
+        "Desktop-Store",
+        "Desktop-Friends",
+        "Desktop-Tweak"
+      ]
+    },
     "TabTarget": {
       "description": "A reuseable injection target.",
       "type": "array",
@@ -139,7 +203,7 @@
       }
     },
     "InjectionTarget": {
-      "description": "A file to inject into Steam. The path should be relative to the theme.json file, with preceding '.' and '/' removed.",
+      "description": "A file to inject into Steam. The path should be relative to the theme.json file, with no preceding slashes. (\"./\" or \"/\")",
       "type": "array",
       "uniqueItems": true,
       "items": {
@@ -163,7 +227,7 @@
           ]
         },
         {
-          "description": "A legacy injection target. These should be avoided in new Themes, but are fine to leave in old ones.",
+          "description": "A legacy injection target. These should be avoided in new themes, but are fine to leave in old ones.",
           "enum": [
             "SP",
             "Steam Big Picture Mode",
@@ -183,7 +247,7 @@
       ]
     },
     "Patch": {
-      "description": "A patch for this Theme. Allows users to configure parts of the Theme.",
+      "description": "A patch for this theme. Allows users to configure parts of the theme.",
       "oneOf": [
         {
           "description": "A generic patch, used for perminantly showing a component.",
@@ -351,7 +415,7 @@
       "additionalItems": false
     },
     "Components": {
-      "description": "An array of components used in this Theme.",
+      "description": "An array of components used in this theme.",
       "type": "array",
       "items": {
         "anyOf": [
