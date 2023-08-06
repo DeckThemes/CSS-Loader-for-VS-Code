@@ -4,6 +4,12 @@ All notable changes to the `CSS Loader for VS Code` extension will be documented
 
 <!-- Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file. -->
 
+<!-- replace me with new updates! -->
+
+## v1.1.0
+
+ - Adjusted keywords to better fitting ones.
+
 ## v1.0.0
 
 - Initial release of `CSS Loader for VS Code`.

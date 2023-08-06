@@ -68,27 +68,38 @@ jobs:
         with:
           node-version: 16
 
-      - name: Setup Pnpm
-        uses: pnpm/action-setup@v2
+      - name: Publish to Visual Studio Marketplace
+        id: publish-extension
+        uses: HaaLeo/publish-vscode-extension@v1
         with:
-          version: 6.0.2
+          pat: ${{ secrets.AZURE_DEVOPS_TOKEN }}
+          registryUrl: https://marketplace.visualstudio.com
 
-      - name: Install Dependencies
-        run: pnpm install
-
-      - name: Install VSCE
-        run: pnpm install -g @vscode/vsce
-
-      - name: Build CSS Loader for VS Code
+      - name: Upload Release Assets
         uses: actions/github-script@v6
         env:
+          git_branch: "release"
           release_id: ${{ needs.create-release.outputs.release_id }}
           release_tag: ${{ needs.create-release.outputs.tag }}
+          vsix_path: ${{ publish-extension.vsixPath }}
+          changelog_contents: ${{ needs.create-release.outputs.change_log }}
         with:
           script: |
             const fs = require("fs");
             const child_process = require("child_process");
             const path = require("path");
+            
+            const config = (prop, value) => exec.exec(`git config ${prop} "${value}"`);
+            const add = (file) => exec.exec(`git add ${file}`);
+            const commit = (message) => exec.exec(`git commit -m "${message}"`);
+            const push = (branch) => exec.exec(`git push origin ${branch} --follow-tags`);
+            const updateOrigin = (repo) => exec.exec(`git remote set-url origin ${repo}`);
+            
+            core.setSecret(process.env.GITHUB_TOKEN);
+            
+            updateOrigin(`https://x-access-token:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`);
+            config('user.email', "deckthemes.release.action@github.com");
+            config('user.name', "DeckThemes Release Action");
 
             async function uploadReleaseAsset(name, contents) {
               await github.rest.repos.uploadReleaseAsset({
@@ -101,16 +112,30 @@ jobs:
             }
 
             const cwdPath = path.resolve(process.cwd());
-
-            // * build the extension with `pnpm run package`
-            child_process.execSync("pnpm run package");
-
-            const packagePath = path.join(cwdPath, `css-loader-for-vs-code-${process.env.release_tag}.vsix`);
             const schemaPath = path.join(cwdPath, `manifest-schema.json`);
 
             // * upload release assets
-            await uploadReleaseAsset(`css-loader-for-vs-code-${process.env.release_tag}.vsix`, fs.readFileSync(packagePath));
+            await uploadReleaseAsset(`css-loader-for-vs-code-${process.env.release_tag}.vsix`, fs.readFileSync(process.env.vsix_path));
             await uploadReleaseAsset(`schema.json`, fs.readFileSync(schemaPath));
+            
+
+            const changelogFilePath = path.join(cwdPath, "CHANGELOG.md");
+            let changelogFileContents = fs.readFileSync(changelogFilePath);
+
+            const changelogReplacer = `
+            <!-- replace me with new updates! -->
+
+            ## ${process.env.release_tag}
+
+            ${process.env.changelog_contents}
+            `;
+            changelogFileContents = changelogFileContents.replace("<!-- replace me with new updates! -->", changelogReplacer);
+            
+            fs.writeFileSync(changelogFilePath, changelogFileContents);
+
+            await add(".");
+            await commit("chore(release): updated changelog file");
+            await push(process.env.git_branch);
 
   publish-release:
     needs: [create-release, build-extension]
