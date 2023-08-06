@@ -115,13 +115,11 @@ jobs:
             const changelogFilePath = path.join(cwdPath, "CHANGELOG.md");
             let changelogFileContents = fs.readFileSync(changelogFilePath, 'utf8');
 
-            const changelogReplacer = `
-            <!-- replace me with new updates! -->
+            const changelogReplacer = `<!-- replace me with new updates! -->
 
             ## ${process.env.release_tag}
 
-            ${process.env.changelog_contents}
-            `;
+            ${process.env.changelog_contents}`;
             changelogFileContents = changelogFileContents.replace("<!-- replace me with new updates! -->", changelogReplacer);
             
             fs.writeFileSync(changelogFilePath, changelogFileContents);
@@ -135,7 +133,7 @@ jobs:
         uses: HaaLeo/publish-vscode-extension@v1
         with:
           # pat: ${{ secrets.AZURE_DEVOPS_TOKEN }}
-          pat: ""
+          pat: "temp-stub"
           dryRun: true
           registryUrl: https://marketplace.visualstudio.com
 

@@ -4,14 +4,7 @@ All notable changes to the `CSS Loader for VS Code` extension will be documented
 
 <!-- Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file. -->
 
-
 <!-- replace me with new updates! -->
-
-## v1.5.1
-
-Bug Fixes:
-* fix: missed needed utf8 ([14d3b48](https://github.com/DeckThemes/CSS-Loader-VSCode/commit/14d3b48))
-
 
 ## v1.1.0
 
