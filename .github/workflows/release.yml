@@ -113,7 +113,7 @@ jobs:
 
             const cwdPath = path.resolve(process.cwd());
             const changelogFilePath = path.join(cwdPath, "CHANGELOG.md");
-            let changelogFileContents = fs.readFileSync(changelogFilePath);
+            let changelogFileContents = fs.readFileSync(changelogFilePath, 'utf8');
 
             const changelogReplacer = `
             <!-- replace me with new updates! -->
