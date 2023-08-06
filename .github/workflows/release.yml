@@ -81,7 +81,7 @@ jobs:
           git_branch: "release"
           release_id: ${{ needs.create-release.outputs.release_id }}
           release_tag: ${{ needs.create-release.outputs.tag }}
-          vsix_path: ${{ publish-extension.vsixPath }}
+          vsix_path: ${{ steps.publish-extension.vsixPath }}
           changelog_contents: ${{ needs.create-release.outputs.change_log }}
         with:
           script: |
@@ -117,7 +117,7 @@ jobs:
             // * upload release assets
             await uploadReleaseAsset(`css-loader-for-vs-code-${process.env.release_tag}.vsix`, fs.readFileSync(process.env.vsix_path));
             await uploadReleaseAsset(`schema.json`, fs.readFileSync(schemaPath));
-            
+
 
             const changelogFilePath = path.join(cwdPath, "CHANGELOG.md");
             let changelogFileContents = fs.readFileSync(changelogFilePath);
