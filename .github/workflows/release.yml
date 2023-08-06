@@ -73,6 +73,9 @@ jobs:
         with:
           version: 8.6.11
 
+      - name: Install Dependencies
+        run: pnpm install
+
       - name: Publish to Visual Studio Marketplace
         id: publish-extension
         uses: HaaLeo/publish-vscode-extension@v1
