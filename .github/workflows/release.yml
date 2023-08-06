@@ -1,0 +1,142 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - "release"
+
+jobs:
+  create-release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+    outputs:
+      release_id: ${{ steps.create-release.outputs.result }}
+      change_log: ${{ steps.changelog.outputs.clean_changelog }}
+      version: ${{ steps.changelog.outputs.version }}
+      tag: ${{ steps.changelog.outputs.tag }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Conventional Changelog Action
+        id: changelog
+        uses: ./.github/workflows/custom-changelog
+        with:
+          github-token: ${{ secrets.github_token }}
+
+      - name: Create Release
+        id: create-release
+        uses: actions/github-script@v6
+        env:
+          RELEASE_TAG: ${{ steps.changelog.outputs.tag }}
+          RELEASE_LOG: ${{ steps.changelog.outputs.clean_changelog }}
+        with:
+          script: |
+            const { data } = await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `${process.env.RELEASE_TAG}`,
+              name: `CSS Loader for VS Code ${process.env.RELEASE_TAG}`,
+              body: `${process.env.RELEASE_LOG}`,
+              draft: true,
+              prerelease: false
+            });
+            return data.id
+
+  build-extension:
+    needs: create-release
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: release
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Setup Pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 6.0.2
+
+      - name: Install Dependencies
+        run: pnpm install
+
+      - name: Install VSCE
+        run: pnpm install -g @vscode/vsce
+
+      - name: Build CSS Loader for VS Code
+        uses: actions/github-script@v6
+        env:
+          release_id: ${{ needs.create-release.outputs.release_id }}
+          release_tag: ${{ needs.create-release.outputs.tag }}
+        with:
+          script: |
+            const fs = require("fs");
+            const child_process = require("child_process");
+            const path = require("path");
+
+            async function uploadReleaseAsset(name, contents) {
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: process.env.release_id,
+                name: name,
+                data: contents
+              });
+            }
+
+            const cwdPath = path.resolve(process.cwd());
+
+            // * build the extension with `pnpm run package`
+            child_process.execSync("pnpm run package");
+
+            const packagePath = path.join(cwdPath, `css-loader-for-vs-code-${process.env.release_tag}.vsix`);
+            const schemaPath = path.join(cwdPath, `manifest-schema.json`);
+
+            // * upload release assets
+            await uploadReleaseAsset(`css-loader-for-vs-code-${process.env.release_tag}.vsix`, fs.readFileSync(packagePath));
+            await uploadReleaseAsset(`schema.json`, fs.readFileSync(schemaPath));
+
+  publish-release:
+    needs: [create-release, build-extension]
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: release
+          
+      - name: Publish Release
+        id: publish-release
+        uses: actions/github-script@v6
+        env:
+          release_id: ${{ needs.create-release.outputs.release_id }}
+        with:
+          script: |
+            github.rest.repos.updateRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: process.env.release_id,
+              draft: false,
+              prerelease: false
+            })
+  
