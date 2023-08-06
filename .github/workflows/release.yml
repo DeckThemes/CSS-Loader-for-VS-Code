@@ -76,20 +76,12 @@ jobs:
       - name: Install Dependencies
         run: pnpm install
 
-      - name: Publish to Visual Studio Marketplace
-        id: publish-extension
-        uses: HaaLeo/publish-vscode-extension@v1
-        with:
-          pat: ${{ secrets.AZURE_DEVOPS_TOKEN }}
-          registryUrl: https://marketplace.visualstudio.com
-
-      - name: Upload Release Assets
+      - name: "Update CHANGELOG.md"
         uses: actions/github-script@v6
         env:
           git_branch: "release"
           release_id: ${{ needs.create-release.outputs.release_id }}
           release_tag: ${{ needs.create-release.outputs.tag }}
-          vsix_path: ${{ steps.publish-extension.vsixPath }}
           changelog_contents: ${{ needs.create-release.outputs.change_log }}
         with:
           script: |
@@ -119,14 +111,6 @@ jobs:
               });
             }
 
-            const cwdPath = path.resolve(process.cwd());
-            const schemaPath = path.join(cwdPath, `manifest-schema.json`);
-
-            // * upload release assets
-            await uploadReleaseAsset(`css-loader-for-vs-code-${process.env.release_tag}.vsix`, fs.readFileSync(process.env.vsix_path));
-            await uploadReleaseAsset(`schema.json`, fs.readFileSync(schemaPath));
-
-
             const changelogFilePath = path.join(cwdPath, "CHANGELOG.md");
             let changelogFileContents = fs.readFileSync(changelogFilePath);
 
@@ -144,6 +128,45 @@ jobs:
             await add(".");
             await commit("chore(release): updated changelog file");
             await push(process.env.git_branch);
+
+      - name: Publish to Visual Studio Marketplace
+        id: publish-extension
+        uses: HaaLeo/publish-vscode-extension@v1
+        with:
+          # pat: ${{ secrets.AZURE_DEVOPS_TOKEN }}
+          pat: ""
+          dryRun: true
+          registryUrl: https://marketplace.visualstudio.com
+
+      - name: Upload Release Assets
+        uses: actions/github-script@v6
+        env:
+          release_id: ${{ needs.create-release.outputs.release_id }}
+          release_tag: ${{ needs.create-release.outputs.tag }}
+          vsix_path: ${{ steps.publish-extension.vsixPath }}
+        with:
+          script: |
+            const fs = require("fs");
+            const child_process = require("child_process");
+            const path = require("path");
+
+            async function uploadReleaseAsset(name, contents) {
+              await github.rest.repos.uploadReleaseAsset({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                release_id: process.env.release_id,
+                name: name,
+                data: contents
+              });
+            }
+
+            const cwdPath = path.resolve(process.cwd());
+            const schemaPath = path.join(cwdPath, `manifest-schema.json`);
+
+            core.info(process.env.vsix_path);
+            // * upload release assets
+            await uploadReleaseAsset(`css-loader-for-vs-code-${process.env.release_tag}.vsix`, fs.readFileSync(process.env.vsix_path));
+            await uploadReleaseAsset(`schema.json`, fs.readFileSync(schemaPath));
 
   publish-release:
     needs: [create-release, build-extension]
