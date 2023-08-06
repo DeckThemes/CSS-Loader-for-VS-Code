@@ -63,22 +63,29 @@
       "uniqueItems": true
     },
     "target": {
-      "anyOf": [
-        {
-          "$ref": "#/definitions/ThemeTarget"
-        },
-        {
-          "description": "An array of theme targets. These helps users tell what the theme styles at a glance.",
-          "type": "array",
-          "items": {
-            "anyOf": [
-              {
-                "$ref": "#/definitions/ThemeTarget"
-              }
-            ]
-          },
-          "uniqueItems": true
-        }
+      "description": "A theme target. This helps users tell what the theme styles at a glance.",
+      "enum": [
+        "System-Wide",
+        "Home",
+        "Library",
+        "Store",
+        "Friends and Chat",
+        "Tweak",
+        "Keyboard",
+        "Other",
+        "Preset",
+        "Snippet",
+        "Media",
+        "Lock Screen",
+        "Background",
+        "Downloads",
+        "Settings",
+
+        "Desktop",
+        "Desktop-Library",
+        "Desktop-Store",
+        "Desktop-Friends",
+        "Desktop-Tweak"
       ]
     },
     "tabs": {
@@ -168,32 +175,6 @@
   ],
   "additionalProperties": false,
   "definitions": {
-    "ThemeTarget": {
-      "description": "A theme target. This helps users tell what the theme styles at a glance.",
-      "enum": [
-        "System-Wide",
-        "Home",
-        "Library",
-        "Store",
-        "Friends and Chat",
-        "Tweak",
-        "Keyboard",
-        "Other",
-        "Preset",
-        "Snippet",
-        "Media",
-        "Lock Screen",
-        "Background",
-        "Downloads",
-        "Settings",
-
-        "Desktop",
-        "Desktop-Library",
-        "Desktop-Store",
-        "Desktop-Friends",
-        "Desktop-Tweak"
-      ]
-    },
     "TabTarget": {
       "description": "A reuseable injection target.",
       "type": "array",
