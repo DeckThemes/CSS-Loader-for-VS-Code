@@ -111,6 +111,7 @@ jobs:
               });
             }
 
+            const cwdPath = path.resolve(process.cwd());
             const changelogFilePath = path.join(cwdPath, "CHANGELOG.md");
             let changelogFileContents = fs.readFileSync(changelogFilePath);
 
