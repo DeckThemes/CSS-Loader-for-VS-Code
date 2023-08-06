@@ -131,9 +131,7 @@ jobs:
       - name: Publish to Visual Studio Marketplace
         uses: HaaLeo/publish-vscode-extension@v1
         with:
-          # pat: ${{ secrets.AZURE_DEVOPS_TOKEN }}
-          pat: "temp-stub"
-          dryRun: true
+          pat: ${{ secrets.AZURE_DEVOPS_TOKEN }}
           registryUrl: https://marketplace.visualstudio.com
 
       - name: Upload Release Assets
