@@ -2,14 +2,14 @@
   "name": "css-loader-for-vs-code",
   "displayName": "CSS Loader for VS Code",
   "description": "Enhances the CSS Loader theme dev experience.",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "icon": "./assets/logo_128x128.png",
   "galleryBanner": {
     "color": "#0d0f11",
     "theme": "dark"
   },
   "homepage": "https://deckthemes.com",
-  "repository": "https://github.com/DeckThemes/CSS-Loader-for-VSCode",
+  "repository": "https://github.com/DeckThemes/CSS-Loader-for-VS-Code",
   "publisher": "DeckThemes",
   "license": "LGPL-3.0-or-later",
   "author": {
