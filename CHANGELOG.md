@@ -6,6 +6,11 @@ All notable changes to the `CSS Loader for VS Code` extension will be documented
 
 <!-- replace me with new updates! -->
 
+## v1.4.2
+
+Bug Fixes:
+* fix: corrected repo url ([7bd03c4](https://github.com/DeckThemes/CSS-Loader-for-VSCode/commit/7bd03c4))
+
 ## v1.4.1
 
 Bug Fixes:
