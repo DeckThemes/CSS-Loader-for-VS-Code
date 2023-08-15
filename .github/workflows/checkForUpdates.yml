@@ -1,0 +1,98 @@
+name: Check for Updates
+
+on:
+  schedule:
+    - cron: "00 0 * * 0" # Run every Sunday at 12:00 AM
+  workflow_dispatch:
+
+jobs:
+  check-for-changes:
+    permissions:
+      contents: write
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: dev
+
+      - name: Checkout SDH-CssLoader
+        uses: actions/checkout@v3
+        with:
+          repository: suchmememanyskill/SDH-CssLoader
+          path: css-loader
+          ref: main
+
+      - name: Check DeckThemes API
+        uses: actions/github-script@v3
+        env:
+          git_branch: dev
+        with:
+          script: |
+            const fs = require("fs");
+            const child_process = require("child_process");
+            const path = require("path");
+
+            let newTargets = false;
+            let newManifestVersion = false;
+            
+            const config = (prop, value) => exec.exec(`git config ${prop} "${value}"`);
+            const add = (file) => exec.exec(`git add ${file}`);
+            const commit = (message) => exec.exec(`git commit -m "${message}"`);
+            const push = (branch) => exec.exec(`git push origin ${branch} --follow-tags`);
+            const updateOrigin = (repo) => exec.exec(`git remote set-url origin ${repo}`);
+            
+            core.setSecret(process.env.GITHUB_TOKEN);
+            
+            updateOrigin(`https://x-access-token:${process.env.GITHUB_TOKEN}@github.com/${process.env.GITHUB_REPOSITORY}.git`);
+            config('user.email', "deckthemes.auto-update.action@github.com");
+            config('user.name', "DeckThemes Auto-Update Action");
+
+            const cwdPath = path.resolve(process.cwd());
+            const schemaPath = path.join(cwdPath, `manifest-schema.json`);
+            const schemaStr = fs.readFileSync(schemaPath, 'utf8');
+            const schema = JSON.parse(schemaStr);
+
+
+            const response = await fetch('https://api.deckthemes.com/themes/filters?type=CSS');
+            const data = await response.json();
+
+            //? Check for New Targets
+            const listFromSchema = schema.properties.targets.enum;
+            const listFromApi = Object.keys(data.filters);
+            //TODO: check for differences
+
+            const listsAreEqual = listFromSchema.every((elem) => listFromApi.includes(elem)) && listFromApi.every((elem) => listFromSchema.includes(elem));
+            if (!listsAreEqual) {
+              newTargets = true;
+              schema.properties.targets.enum = listFromApi;
+            }
+
+
+            const mainPyPath = path.join(cwdPath, "css-loader", "SDH-CssLoader", "main.py");
+            const mainPyContents = fs.readFileSync(mainPyPath, 'utf8');
+            const manifestVersionPattern = /CSS_LOADER_VER = (.*)/;
+
+            //? Check for New Manifest Version
+            const currentVersion = schema.properties.manifest_version.const;
+            const newVersionStr = mainPyContents.match(manifestVersionPattern)[0];
+            const newVersion = parseInt(newVersionStr);
+
+            if (currentVersion !== newVersion) {
+              newManifestVersion = true;
+              schema.properties.manifest_version.description = `The manifest version. This should almost always be the latest version.\n\nLatest Version: ${newVersion}`;
+              schema.properties.manifest_version.const = newVersion;
+            }
+
+
+            if (newTargets || newManifestVersion) {
+              fs.writeFileSync(schemaPath, JSON.stringify(schema, null, '\t'));
+
+              const commitMsg = (newTargets && newManifestVersion) ? `updated manifest version to ${newVersion} and updated theme targets` : (newManifestVersion ? `updated manifest version to ${newVersion}` : `updated theme targets`);
+
+              await add(".");
+              await commit(`feat: ${commitMsg}`);
+              await push(process.env.git_branch);
+            }
