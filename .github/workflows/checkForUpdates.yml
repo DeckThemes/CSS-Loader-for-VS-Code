@@ -11,6 +11,7 @@ jobs:
       contents: write
     runs-on: ubuntu-20.04
 
+    if: contains(github.ref, "release")
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -27,16 +28,60 @@ jobs:
 
       - name: Check DeckThemes API
         uses: actions/github-script@v3
-        env:
-          git_branch: dev
         with:
           script: |
             const fs = require("fs");
             const child_process = require("child_process");
             const path = require("path");
 
+            function sleep(ms) {
+              return new Promise((res) => setTimeout(res, ms));
+            }
+
+            async function openPullRequest(title, targetBranch, sourceBranch, body) {
+              return await github.rest.repos.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                head: sourceBranch,
+                base: targetBranch,
+                body: body
+              });
+            }
+
+            async function mergePullRequest(pullNumber) {
+              await github.rest.repos.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pullNumber
+              });
+            }
+
+            async function getLatestTag() {
+              const unsorted = await github.rest.repos.listTags({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+
+              const sorter = (v1, v2) => {
+                const v1Parts = v1.substring(1).split(".");
+                const v2Parts = v2.substring(1).split(".");
+
+                const major = parseInt(v1Parts[0]) - parseInt(v2Parts[0]);
+                const minor = parseInt(v1Parts[1]) - parseInt(v2Parts[1]);
+                const patch = parseInt(v1Parts[2]) - parseInt(v2Parts[2]);
+
+                return major || minor || patch;
+              }
+
+              return unsorted.sort((v1, v2) => sorter(v1, v2))[0];
+            }
+
+
             let newTargets = false;
             let newManifestVersion = false;
+            const srcBranch = "dev";
+            const requestInterval = 15000;
             
             const config = (prop, value) => exec.exec(`git config ${prop} "${value}"`);
             const add = (file) => exec.exec(`git add ${file}`);
@@ -94,5 +139,32 @@ jobs:
 
               await add(".");
               await commit(`feat: ${commitMsg}`);
-              await push(process.env.git_branch);
+              await push(srcBranch);
+
+
+              const latestTag = await getLatestTag();
+              const latestTagParts = latestTag.subString(1).split(".");
+              const nextTag = `${latestTagParts[0]}.${parseInt(latestTagParts[1]) + 1}.${latestTagParts[2]}`
+
+              const releasePRTitle = `chore: build v${nextTag}`;
+              const releasePR = await openPullRequest(releasePRTitle, "release", srcBranch, "");
+              const releasePRNumber = releasePR.number;
+              await sleep(requestInterval);
+              await mergePullRequest(releasePRNumber);
+              
+              await sleep(requestInterval);
+
+              const mainPRTitle = `chore: bring main up to v${nextTag}`;
+              const mainPR = await openPullRequest(mainPRTitle, "main", "release", "");
+              const mainPRNumber = mainPR.number;
+              await sleep(requestInterval);
+              await mergePullRequest(mainPRNumber);
+              
+              await sleep(requestInterval);
+
+              const devPRTitle = `chore: bring dev up to v${nextTag}`;
+              const devPR = await openPullRequest(devPRTitle, "dev", "main", "");
+              const devPRNumber = devPR.number;
+              await sleep(requestInterval);
+              await mergePullRequest(devPRNumber);
             }
