@@ -81,7 +81,7 @@ jobs:
             let newTargets = false;
             let newManifestVersion = false;
             const srcBranch = "dev";
-            const requestInterval = 15000;
+            const requestInterval = 30000;
             
             const config = (prop, value) => exec.exec(`git config ${prop} "${value}"`);
             const add = (file) => exec.exec(`git add ${file}`);
@@ -151,20 +151,4 @@ jobs:
               const releasePRNumber = releasePR.number;
               await sleep(requestInterval);
               await mergePullRequest(releasePRNumber);
-              
-              await sleep(requestInterval);
-
-              const mainPRTitle = `chore: bring main up to v${nextTag}`;
-              const mainPR = await openPullRequest(mainPRTitle, "main", "release", "");
-              const mainPRNumber = mainPR.number;
-              await sleep(requestInterval);
-              await mergePullRequest(mainPRNumber);
-              
-              await sleep(requestInterval);
-
-              const devPRTitle = `chore: bring dev up to v${nextTag}`;
-              const devPR = await openPullRequest(devPRTitle, "dev", "main", "");
-              const devPRNumber = devPR.number;
-              await sleep(requestInterval);
-              await mergePullRequest(devPRNumber);
             }
