@@ -6,6 +6,14 @@ All notable changes to the `CSS Loader for VS Code` extension will be documented
 
 <!-- replace me with new updates! -->
 
+## v1.5.0
+
+New Features:
+* feat: automatic updates complete ([27bc44f](https://github.com/DeckThemes/CSS-Loader-for-VS-Code/commit/27bc44f))
+
+Bug Fixes:
+* fix: clarified name can not be changed after submitting ([9e53347](https://github.com/DeckThemes/CSS-Loader-for-VS-Code/commit/9e53347))
+
 ## v1.4.3
 
 Bug Fixes:
