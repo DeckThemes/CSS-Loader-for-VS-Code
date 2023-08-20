@@ -2,7 +2,7 @@ name: Check for Updates
 
 on:
   schedule:
-    - cron: "12 0 * * 0" # Run every Sunday at 12:00 AM
+    - cron: "00 0 * * 0" # Run every Sunday at 12:00 AM
   workflow_dispatch:
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
           ref: main
 
       - name: Check DeckThemes API
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           script: |
             const fs = require("fs");
@@ -104,24 +104,24 @@ jobs:
             const data = await response.json();
 
             //? Check for New Targets
-            const listFromSchema = schema.properties.targets.enum;
+            const listFromSchema = schema.properties.target.enum;
             const listFromApi = Object.keys(data.filters);
             //TODO: check for differences
 
             const listsAreEqual = listFromSchema.every((elem) => listFromApi.includes(elem)) && listFromApi.every((elem) => listFromSchema.includes(elem));
             if (!listsAreEqual) {
               newTargets = true;
-              schema.properties.targets.enum = listFromApi;
+              schema.properties.target.enum = listFromApi;
             }
 
 
-            const mainPyPath = path.join(cwdPath, "css-loader", "SDH-CssLoader", "main.py");
-            const mainPyContents = fs.readFileSync(mainPyPath, 'utf8');
+            const themePyPath = path.join(cwdPath, "css-loader", "css_theme.py");
+            const themePyContents = fs.readFileSync(themePyPath, 'utf8');
             const manifestVersionPattern = /CSS_LOADER_VER = (.*)/;
 
             //? Check for New Manifest Version
             const currentVersion = schema.properties.manifest_version.const;
-            const newVersionStr = mainPyContents.match(manifestVersionPattern)[0];
+            const newVersionStr = themePyContents.match(manifestVersionPattern)[1];
             const newVersion = parseInt(newVersionStr);
 
             if (currentVersion !== newVersion) {
