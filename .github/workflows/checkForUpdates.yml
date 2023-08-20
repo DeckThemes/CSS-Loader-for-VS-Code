@@ -104,14 +104,14 @@ jobs:
             const data = await response.json();
 
             //? Check for New Targets
-            const listFromSchema = schema.properties.targets.enum;
+            const listFromSchema = schema.properties.target.enum;
             const listFromApi = Object.keys(data.filters);
             //TODO: check for differences
 
             const listsAreEqual = listFromSchema.every((elem) => listFromApi.includes(elem)) && listFromApi.every((elem) => listFromSchema.includes(elem));
             if (!listsAreEqual) {
               newTargets = true;
-              schema.properties.targets.enum = listFromApi;
+              schema.properties.target.enum = listFromApi;
             }
 
 
