@@ -115,13 +115,13 @@ jobs:
             }
 
 
-            const mainPyPath = path.join(cwdPath, "css-loader", "main.py");
-            const mainPyContents = fs.readFileSync(mainPyPath, 'utf8');
+            const themePyPath = path.join(cwdPath, "css-loader", "css_theme.py");
+            const themePyContents = fs.readFileSync(themePyPath, 'utf8');
             const manifestVersionPattern = /CSS_LOADER_VER = (.*)/;
 
             //? Check for New Manifest Version
             const currentVersion = schema.properties.manifest_version.const;
-            const newVersionStr = mainPyContents.match(manifestVersionPattern)[0];
+            const newVersionStr = themePyContents.match(manifestVersionPattern)[1];
             const newVersion = parseInt(newVersionStr);
 
             if (currentVersion !== newVersion) {
