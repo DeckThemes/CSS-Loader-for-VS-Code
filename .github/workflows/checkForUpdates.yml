@@ -115,7 +115,7 @@ jobs:
             }
 
 
-            const mainPyPath = path.join(cwdPath, "css-loader", "SDH-CssLoader", "main.py");
+            const mainPyPath = path.join(cwdPath, "css-loader", "main.py");
             const mainPyContents = fs.readFileSync(mainPyPath, 'utf8');
             const manifestVersionPattern = /CSS_LOADER_VER = (.*)/;
 
