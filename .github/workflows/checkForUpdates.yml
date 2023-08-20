@@ -2,7 +2,7 @@ name: Check for Updates
 
 on:
   schedule:
-    - cron: "12 0 * * 0" # Run every Sunday at 12:00 AM
+    - cron: "00 0 * * 0" # Run every Sunday at 12:00 AM
   workflow_dispatch:
 
 jobs:
