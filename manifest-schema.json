@@ -1,483 +1,494 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Theme Manifest",
-  "description": "The manifest file for a CSS Loader Theme.",
-  "type": "object",
-  "default": {
-    "name": "An Awesome Theme",
-    "description": "Something to spice up your Steamdeck experience!",
-    "author": "You",
-    "version": "v1.0.0",
-    "manifest_version": 8,
-    "target": "Home",
-    "tabs": {
-      "default": [ "bigpicture" ]
-    },
-    "inject": {
-      "shared.css": []
-    }
-  },
-  "properties": {
-    "$schema": {
-      "description": "The JSON schema for a CSS Loader Theme Manifest.",
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "name": {
-      "description": "The name of the theme. Make it short and catchy! (IMPORTANT: Once submitted, this name can not be changed)",
-      "type": "string"
-    },
-    "description": {
-      "description": "A description of the theme. This should explain what it does, and any side effects it has (breaks navigation, etc), as well as any incompatabilities with other themes.",
-      "type": "string"
-    },
-    "author": {
-      "description": "The author of the theme. Can be a discord tag, or just your name/username",
-      "type": "string"
-    },
-    "version": {
-      "description": "The version of the theme. It should follow Semantic Versioning.\n\nSemVer reference: https://docs.npmjs.com/about-semantic-versioning",
-      "type": "string"
-    },
-    "manifest_version": {
-      "description": "The manifest version. This should almost always be the latest version.\n\nLatest Version: 8",
-      "const": 8
-    },
-    "flags": {
-      "description": "A list of flags that modify the behavior of the theme.",
-      "type": "array",
-      "items": {
-        "anyOf": [
-          {
-            "description": "A flag that modifies the behavior of the theme.",
-            "enum": [
-              "PRESET",
-              "KEEP_DEPENDENCIES",
-              "OPTIONAL_DEPENDENCIES"
-            ]
-          }
-        ]
-      },
-      "uniqueItems": true
-    },
-    "target": {
-      "description": "A theme target. This helps users tell what the theme styles at a glance.",
-      "enum": [
-        "System-Wide",
-        "Home",
-        "Library",
-        "Store",
-        "Friends and Chat",
-        "Tweak",
-        "Keyboard",
-        "Other",
-        "Preset",
-        "Snippet",
-        "Media",
-        "Lock Screen",
-        "Background",
-        "Downloads",
-        "Settings",
-
-        "Desktop",
-        "Desktop-Library",
-        "Desktop-Store",
-        "Desktop-Friends",
-        "Desktop-Tweak"
-      ]
-    },
-    "tabs": {
-      "description": "A dictionary of reuseable injection targets, where the key is the label, and the value is an array of injection targets.",
-      "type": "object",
-      "properties": {
-        "default": {
-          "description": "The default injection target. This is used when a file's injection target is \"[]\"."  
-        }
-      },
-      "patternProperties": {
-        ".*": {
-          "$ref": "#/definitions/TabTarget"
-        }
-      }
-    },
-    "inject": {
-      "description": "A dictionary of files and css variables to inject.\n\nFor files, the key should be the relative path to the .css file, and the value is an array of injection targets.\n\nFor css variables, the key should be the variable name (including the --), and the value should be an array of injection targets, with index 0 being the variable's value.",
-      "type": "object",
-      "patternProperties": {
-        "^(\\-\\-[a-z0-9\\-\\_]+)|.*\\.css$": {
-          "$ref": "#/definitions/InjectionTarget"
-        }
-      }
-    },
-    "dependencies": {
-      "description": "A dictionary of other themes that will be installed if not present along with this theme.",
-      "type": "object",
-      "patternProperties": {
-        ".*": {
-          "description": "A dependency of this theme. Can be configured to set patch values that will override the defaults.",
-          "type": "object",
-          "patternProperties": {
-            ".*": {
-              "anyOf": [
-                {
-                  "description": "An override for a patch.",
-                  "type": "string"
-                },
-                {
-                  "description": "An override for a patch.",
-                  "type": "object",
-                  "properties": {
-                    "value": {
-                      "description": "The override value.",
-                      "type": "string"
-                    },
-                    "components": {
-                      "description": "A dictionary of this patch's components to override.",
-                      "type": "object",
-                      "patternProperties": {
-                        ".*": {
-                          "description": "A component of this patch to override.",
-                          "type": "string"
-                        }
-                      }
-                    }
-                  },
-                  "required": [
-                    "value",
-                    "components"
-                  ]
-                }
-              ]
-            }
-          }
-        }
-      }
-    },
-    "patches": {
-      "description": "A dictionary of options for this theme, where the key is the option's name, and the value is a patch.",
-      "type": "object",
-      "patternProperties": {
-        ".*": {
-          "$ref": "#/definitions/Patch"
-        }
-      }
-    }
-  },
-  "required": [
-    "name",
-    "description",
-    "author",
-    "version",
-    "manifest_version",
-    "target"
-  ],
-  "additionalProperties": false,
-  "definitions": {
-    "TabTarget": {
-      "description": "A reuseable injection target.",
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/definitions/InjectionTargets"
-      }
-    },
-    "InjectionTarget": {
-      "description": "A file to inject into Steam. The path should be relative to the theme.json file, with no preceding slashes. (\"./\" or \"/\")",
-      "type": "array",
-      "uniqueItems": true,
-      "items": {
-        "$ref": "#/definitions/InjectionTargets"
-      }
-    },
-    "InjectionTargets": {
-      "anyOf": [
-        {
-          "description": "A predefined injection target resolved by CSS Loader.",
-          "enum": [
-            ".*",
-            "desktop",
-            "desktopchat",
-            "desktoppopup",
-            "desktopoverlay",
-            "desktopcontextmenu",
-            "bigpicture",
-            "bigpictureoverlay",
-            "store"
-          ]
-        },
-        {
-          "description": "A legacy injection target. These should be avoided in new themes, but are fine to leave in old ones.",
-          "enum": [
-            "SP",
-            "Steam Big Picture Mode",
-            "MainMenu",
-            "MainMenu_.*",
-            "QuickAccess",
-            "QuickAccess_.*",
-            "Steam",
-            "SteamLibraryWindow",
-            "All"
-          ]
-        },
-        {
-          "description": "A custom injection target or variable value. This is typically a key defined in \"tabs\", a tab url, a regex expression, or the value of a variable.",
-          "type": "string"
-        }
-      ]
-    },
-    "Patch": {
-      "description": "A patch for this theme. Allows users to configure parts of the theme.",
-      "oneOf": [
-        {
-          "description": "A generic patch, used for perminantly showing a component.",
-          "type": "object",
-          "properties": {
-            "type": {
-              "description": "The type of this patch.",
-              "const": "none"
-            },
-            "default": {
-              "description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
-              "type": "string"
-            },
-            "values": {
-              "description": "Should be a dictionary with a \"_\" prop.",
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "description": "An empty dictionary.",
-                  "type": "object",
-                  "properties": {},
-                  "additionalItems": false
-                }
-              },
-              "minProperties": 1,
-              "maxProperties": 1
-            },
-            "components": {
-              "$ref": "#/definitions/Components"
-            }
-          },
-          "required": [
-            "type",
-            "values"
-          ],
-          "additionalItems": false
-        },
-        { "$ref": "#/definitions/TogglePatch" },
-        { "$ref": "#/definitions/DropdownPatch" },
-        { "$ref": "#/definitions/SliderPatch" }
-      ]
-    },
-    "TogglePatch": {
-      "description": "A patch for letting users toggle part of the Theme on/off.",
-      "type": "object",
-      "properties": {
-        "type": {
-          "description": "The type of this patch.",
-          "const": "checkbox"
-        },
-        "default": {
-          "description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
-          "type": "string"
-        },
-        "values": {
-          "description": "The values for this patch.",
-          "type": "object",
-          "properties": {
-            "Yes": {
-              "description": "A dictionary of files and css variables to inject when the checkbox is checked.",
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "$ref": "#/definitions/InjectionTarget"
-                }
-              }
-            },
-            "No": {
-              "description": "A dictionary of files and css variables to inject when the checkbox is not checked.",
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "$ref": "#/definitions/InjectionTarget"
-                }
-              }
-            }
-          },
-          "required": [
-            "Yes",
-            "No"
-          ]
-        },
-        "components": {
-          "$ref": "#/definitions/Components"
-        }
-      },
-      "required": [
-        "type",
-        "values"
-      ],
-      "additionalItems": false
-    },
-    "DropdownPatch": {
-      "description": "A patch for letting users select an option from a predefined list.",
-      "type": "object",
-      "properties": {
-        "type": {
-          "description": "The type of this patch.",
-          "const": "dropdown"
-        },
-        "default": {
-          "description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
-          "type": "string"
-        },
-        "values": {
-          "description": "The values for this dropdown. These are typically words, as otherwise a slider is a better solution.",
-          "type": "object",
-          "patternProperties": {
-            ".*": {
-              "description": "A dictionary of files and css variables to inject when this option is selected.",
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "$ref": "#/definitions/InjectionTarget"
-                }
-              }
-            }
-          }
-        },
-        "components": {
-          "$ref": "#/definitions/Components"
-        }
-      },
-      "required": [
-        "type",
-        "values"
-      ],
-      "additionalItems": false
-    },
-    "SliderPatch": {
-      "description": "A patch for letting users choose values in an interval.",
-      "type": "object",
-      "properties": {
-        "type": {
-          "description": "The type of this patch.",
-          "const": "slider"
-        },
-        "default": {
-          "description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
-          "type": "string"
-        },
-        "values": {
-          "description": "The values for this slider. These are typically numbers, as otherwise a dropdown is a better solution.",
-          "type": "object",
-          "patternProperties": {
-            ".*": {
-              "description": "A dictionary of files and css variables to inject when this option is selected.",
-              "type": "object",
-              "patternProperties": {
-                ".*": {
-                  "$ref": "#/definitions/InjectionTarget"
-                }
-              }
-            }
-          }
-        },
-        "components": {
-          "$ref": "#/definitions/Components"
-        }
-      },
-      "required": [
-        "type",
-        "values"
-      ],
-      "additionalItems": false
-    },
-    "Components": {
-      "description": "An array of components used in this theme.",
-      "type": "array",
-      "items": {
-        "anyOf": [
-          { "$ref": "#/definitions/ImageComponent" }, 
-          { "$ref": "#/definitions/ColorComponent" } 
-        ]
-      }
-    },
-    "ImageComponent": {
-      "description": "A component for allowing the user to pick an image.",
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "The name of the patch this component should be associated with.",
-          "type": "string"
-        },
-        "type": {
-          "description": "The type of the component.",
-          "const": "image-picker"
-        },
-        "on": {
-          "description": "The value of the patch that should show this component.",
-          "type": "string"
-        },
-        "default": {
-          "description": "The default value of the image picker. Should be a file path starting with the name of this Theme.\n\nExample: \"An Awesome Theme/default-image.png\"",
-          "type": "string",
-          "pattern": "^(?:[\\w]\\:|\\\\)(\\\\[a-z_\\-\\s0-9\\.]+)+\\.(png|apng|jpg|jpeg|webp|gif)$"
-        },
-        "css_variable": {
-          "description": "The name of the css variable this component should use to store its value.",
-          "type": "string",
-          "pattern": "^(\\-\\-[a-z0-9\\-\\_]+)$"
-        },
-        "tabs": {
-          "description": "The injection targets for this component.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/definitions/InjectionTargets"
-          }
-        }
-      },
-      "additionalItems": false
-    },
-    "ColorComponent": {
-      "description": "A component for allowing the user to set a color.",
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "The name of the patch this component should be associated with.",
-          "type": "string"
-        },
-        "type": {
-          "description": "The type of the component.",
-          "const": "color-picker"
-        },
-        "on": {
-          "description": "The value of the patch that should show this component.",
-          "type": "string"
-        },
-        "default": {
-          "description": "The default value of the color picker. Should be in hexadecimal form.\n\nExample: \"#59BF40\"",
-          "type": "string",
-          "pattern": "^#([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
-        },
-        "css_variable": {
-          "description": "The name of the css variable this component should use to store its value.",
-          "type": "string",
-          "pattern": "^(\\-\\-[a-z0-9\\-\\_]+)$"
-        },
-        "tabs": {
-          "description": "The injection targets for this component.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-            "$ref": "#/definitions/InjectionTargets"
-          }
-        }
-      },
-      "additionalItems": false
-    }
-  }
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Theme Manifest",
+	"description": "The manifest file for a CSS Loader Theme.",
+	"type": "object",
+	"default": {
+		"name": "An Awesome Theme",
+		"description": "Something to spice up your Steamdeck experience!",
+		"author": "You",
+		"version": "v1.0.0",
+		"manifest_version": 8,
+		"target": "Home",
+		"tabs": {
+			"default": [
+				"bigpicture"
+			]
+		},
+		"inject": {
+			"shared.css": []
+		}
+	},
+	"properties": {
+		"$schema": {
+			"description": "The JSON schema for a CSS Loader Theme Manifest.",
+			"type": [
+				"string",
+				"null"
+			]
+		},
+		"name": {
+			"description": "The name of the theme. Make it short and catchy! (IMPORTANT: Once submitted, this name can not be changed)",
+			"type": "string"
+		},
+		"description": {
+			"description": "A description of the theme. This should explain what it does, and any side effects it has (breaks navigation, etc), as well as any incompatabilities with other themes.",
+			"type": "string"
+		},
+		"author": {
+			"description": "The author of the theme. Can be a discord tag, or just your name/username",
+			"type": "string"
+		},
+		"version": {
+			"description": "The version of the theme. It should follow Semantic Versioning.\n\nSemVer reference: https://docs.npmjs.com/about-semantic-versioning",
+			"type": "string"
+		},
+		"manifest_version": {
+			"description": "The manifest version. This should almost always be the latest version.\n\nLatest Version: 8",
+			"const": 8
+		},
+		"flags": {
+			"description": "A list of flags that modify the behavior of the theme.",
+			"type": "array",
+			"items": {
+				"anyOf": [
+					{
+						"description": "A flag that modifies the behavior of the theme.",
+						"enum": [
+							"PRESET",
+							"KEEP_DEPENDENCIES",
+							"OPTIONAL_DEPENDENCIES"
+						]
+					}
+				]
+			},
+			"uniqueItems": true
+		},
+		"target": {
+			"description": "A theme target. This helps users tell what the theme styles at a glance.",
+			"enum": [
+				"System-Wide",
+				"Tweak",
+				"Home",
+				"Keyboard",
+				"Other",
+				"Library",
+				"Desktop-Library",
+				"Store",
+				"Desktop",
+				"Snippet",
+				"Profile",
+				"Desktop-Tweak",
+				"Media",
+				"Lock Screen",
+				"Desktop-Store",
+				"Background",
+				"Friends and Chat",
+				"Downloads",
+				"Settings",
+				"Desktop-Friends"
+			]
+		},
+		"tabs": {
+			"description": "A dictionary of reuseable injection targets, where the key is the label, and the value is an array of injection targets.",
+			"type": "object",
+			"properties": {
+				"default": {
+					"description": "The default injection target. This is used when a file's injection target is \"[]\"."
+				}
+			},
+			"patternProperties": {
+				".*": {
+					"$ref": "#/definitions/TabTarget"
+				}
+			}
+		},
+		"inject": {
+			"description": "A dictionary of files and css variables to inject.\n\nFor files, the key should be the relative path to the .css file, and the value is an array of injection targets.\n\nFor css variables, the key should be the variable name (including the --), and the value should be an array of injection targets, with index 0 being the variable's value.",
+			"type": "object",
+			"patternProperties": {
+				"^(\\-\\-[a-z0-9\\-\\_]+)|.*\\.css$": {
+					"$ref": "#/definitions/InjectionTarget"
+				}
+			}
+		},
+		"dependencies": {
+			"description": "A dictionary of other themes that will be installed if not present along with this theme.",
+			"type": "object",
+			"patternProperties": {
+				".*": {
+					"description": "A dependency of this theme. Can be configured to set patch values that will override the defaults.",
+					"type": "object",
+					"patternProperties": {
+						".*": {
+							"anyOf": [
+								{
+									"description": "An override for a patch.",
+									"type": "string"
+								},
+								{
+									"description": "An override for a patch.",
+									"type": "object",
+									"properties": {
+										"value": {
+											"description": "The override value.",
+											"type": "string"
+										},
+										"components": {
+											"description": "A dictionary of this patch's components to override.",
+											"type": "object",
+											"patternProperties": {
+												".*": {
+													"description": "A component of this patch to override.",
+													"type": "string"
+												}
+											}
+										}
+									},
+									"required": [
+										"value",
+										"components"
+									]
+								}
+							]
+						}
+					}
+				}
+			}
+		},
+		"patches": {
+			"description": "A dictionary of options for this theme, where the key is the option's name, and the value is a patch.",
+			"type": "object",
+			"patternProperties": {
+				".*": {
+					"$ref": "#/definitions/Patch"
+				}
+			}
+		}
+	},
+	"required": [
+		"name",
+		"description",
+		"author",
+		"version",
+		"manifest_version",
+		"target"
+	],
+	"additionalProperties": false,
+	"definitions": {
+		"TabTarget": {
+			"description": "A reuseable injection target.",
+			"type": "array",
+			"uniqueItems": true,
+			"items": {
+				"$ref": "#/definitions/InjectionTargets"
+			}
+		},
+		"InjectionTarget": {
+			"description": "A file to inject into Steam. The path should be relative to the theme.json file, with no preceding slashes. (\"./\" or \"/\")",
+			"type": "array",
+			"uniqueItems": true,
+			"items": {
+				"$ref": "#/definitions/InjectionTargets"
+			}
+		},
+		"InjectionTargets": {
+			"anyOf": [
+				{
+					"description": "A predefined injection target resolved by CSS Loader.",
+					"enum": [
+						".*",
+						"desktop",
+						"desktopchat",
+						"desktoppopup",
+						"desktopoverlay",
+						"desktopcontextmenu",
+						"bigpicture",
+						"bigpictureoverlay",
+						"store"
+					]
+				},
+				{
+					"description": "A legacy injection target. These should be avoided in new themes, but are fine to leave in old ones.",
+					"enum": [
+						"SP",
+						"Steam Big Picture Mode",
+						"MainMenu",
+						"MainMenu_.*",
+						"QuickAccess",
+						"QuickAccess_.*",
+						"Steam",
+						"SteamLibraryWindow",
+						"All"
+					]
+				},
+				{
+					"description": "A custom injection target or variable value. This is typically a key defined in \"tabs\", a tab url, a regex expression, or the value of a variable.",
+					"type": "string"
+				}
+			]
+		},
+		"Patch": {
+			"description": "A patch for this theme. Allows users to configure parts of the theme.",
+			"oneOf": [
+				{
+					"description": "A generic patch, used for perminantly showing a component.",
+					"type": "object",
+					"properties": {
+						"type": {
+							"description": "The type of this patch.",
+							"const": "none"
+						},
+						"default": {
+							"description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
+							"type": "string"
+						},
+						"values": {
+							"description": "Should be a dictionary with a \"_\" prop.",
+							"type": "object",
+							"patternProperties": {
+								".*": {
+									"description": "An empty dictionary.",
+									"type": "object",
+									"properties": {},
+									"additionalItems": false
+								}
+							},
+							"minProperties": 1,
+							"maxProperties": 1
+						},
+						"components": {
+							"$ref": "#/definitions/Components"
+						}
+					},
+					"required": [
+						"type",
+						"values"
+					],
+					"additionalItems": false
+				},
+				{
+					"$ref": "#/definitions/TogglePatch"
+				},
+				{
+					"$ref": "#/definitions/DropdownPatch"
+				},
+				{
+					"$ref": "#/definitions/SliderPatch"
+				}
+			]
+		},
+		"TogglePatch": {
+			"description": "A patch for letting users toggle part of the Theme on/off.",
+			"type": "object",
+			"properties": {
+				"type": {
+					"description": "The type of this patch.",
+					"const": "checkbox"
+				},
+				"default": {
+					"description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
+					"type": "string"
+				},
+				"values": {
+					"description": "The values for this patch.",
+					"type": "object",
+					"properties": {
+						"Yes": {
+							"description": "A dictionary of files and css variables to inject when the checkbox is checked.",
+							"type": "object",
+							"patternProperties": {
+								".*": {
+									"$ref": "#/definitions/InjectionTarget"
+								}
+							}
+						},
+						"No": {
+							"description": "A dictionary of files and css variables to inject when the checkbox is not checked.",
+							"type": "object",
+							"patternProperties": {
+								".*": {
+									"$ref": "#/definitions/InjectionTarget"
+								}
+							}
+						}
+					},
+					"required": [
+						"Yes",
+						"No"
+					]
+				},
+				"components": {
+					"$ref": "#/definitions/Components"
+				}
+			},
+			"required": [
+				"type",
+				"values"
+			],
+			"additionalItems": false
+		},
+		"DropdownPatch": {
+			"description": "A patch for letting users select an option from a predefined list.",
+			"type": "object",
+			"properties": {
+				"type": {
+					"description": "The type of this patch.",
+					"const": "dropdown"
+				},
+				"default": {
+					"description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
+					"type": "string"
+				},
+				"values": {
+					"description": "The values for this dropdown. These are typically words, as otherwise a slider is a better solution.",
+					"type": "object",
+					"patternProperties": {
+						".*": {
+							"description": "A dictionary of files and css variables to inject when this option is selected.",
+							"type": "object",
+							"patternProperties": {
+								".*": {
+									"$ref": "#/definitions/InjectionTarget"
+								}
+							}
+						}
+					}
+				},
+				"components": {
+					"$ref": "#/definitions/Components"
+				}
+			},
+			"required": [
+				"type",
+				"values"
+			],
+			"additionalItems": false
+		},
+		"SliderPatch": {
+			"description": "A patch for letting users choose values in an interval.",
+			"type": "object",
+			"properties": {
+				"type": {
+					"description": "The type of this patch.",
+					"const": "slider"
+				},
+				"default": {
+					"description": "The defualt value of this patch. Should be a key in the \"values\" dictionary.",
+					"type": "string"
+				},
+				"values": {
+					"description": "The values for this slider. These are typically numbers, as otherwise a dropdown is a better solution.",
+					"type": "object",
+					"patternProperties": {
+						".*": {
+							"description": "A dictionary of files and css variables to inject when this option is selected.",
+							"type": "object",
+							"patternProperties": {
+								".*": {
+									"$ref": "#/definitions/InjectionTarget"
+								}
+							}
+						}
+					}
+				},
+				"components": {
+					"$ref": "#/definitions/Components"
+				}
+			},
+			"required": [
+				"type",
+				"values"
+			],
+			"additionalItems": false
+		},
+		"Components": {
+			"description": "An array of components used in this theme.",
+			"type": "array",
+			"items": {
+				"anyOf": [
+					{
+						"$ref": "#/definitions/ImageComponent"
+					},
+					{
+						"$ref": "#/definitions/ColorComponent"
+					}
+				]
+			}
+		},
+		"ImageComponent": {
+			"description": "A component for allowing the user to pick an image.",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "The name of the patch this component should be associated with.",
+					"type": "string"
+				},
+				"type": {
+					"description": "The type of the component.",
+					"const": "image-picker"
+				},
+				"on": {
+					"description": "The value of the patch that should show this component.",
+					"type": "string"
+				},
+				"default": {
+					"description": "The default value of the image picker. Should be a file path starting with the name of this Theme.\n\nExample: \"An Awesome Theme/default-image.png\"",
+					"type": "string",
+					"pattern": "^(?:[\\w]\\:|\\\\)(\\\\[a-z_\\-\\s0-9\\.]+)+\\.(png|apng|jpg|jpeg|webp|gif)$"
+				},
+				"css_variable": {
+					"description": "The name of the css variable this component should use to store its value.",
+					"type": "string",
+					"pattern": "^(\\-\\-[a-z0-9\\-\\_]+)$"
+				},
+				"tabs": {
+					"description": "The injection targets for this component.",
+					"type": "array",
+					"uniqueItems": true,
+					"items": {
+						"$ref": "#/definitions/InjectionTargets"
+					}
+				}
+			},
+			"additionalItems": false
+		},
+		"ColorComponent": {
+			"description": "A component for allowing the user to set a color.",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "The name of the patch this component should be associated with.",
+					"type": "string"
+				},
+				"type": {
+					"description": "The type of the component.",
+					"const": "color-picker"
+				},
+				"on": {
+					"description": "The value of the patch that should show this component.",
+					"type": "string"
+				},
+				"default": {
+					"description": "The default value of the color picker. Should be in hexadecimal form.\n\nExample: \"#59BF40\"",
+					"type": "string",
+					"pattern": "^#([A-Fa-f0-9]{8}|[A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$"
+				},
+				"css_variable": {
+					"description": "The name of the css variable this component should use to store its value.",
+					"type": "string",
+					"pattern": "^(\\-\\-[a-z0-9\\-\\_]+)$"
+				},
+				"tabs": {
+					"description": "The injection targets for this component.",
+					"type": "array",
+					"uniqueItems": true,
+					"items": {
+						"$ref": "#/definitions/InjectionTargets"
+					}
+				}
+			},
+			"additionalItems": false
+		}
+	}
 }
