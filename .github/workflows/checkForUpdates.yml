@@ -73,7 +73,7 @@ jobs:
                 return major || minor || patch;
               }
 
-              core.info(unsorted);
+              core.info(JSON.stringify(unsorted));
               return unsorted.sort((v1, v2) => sorter(v1, v2))[0];
             }
 
