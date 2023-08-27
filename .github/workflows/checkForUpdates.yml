@@ -115,6 +115,7 @@ jobs:
               schema.properties.target.enum = listFromApi;
             }
 
+            const latestTag = await getLatestTag();
 
             const themePyPath = path.join(cwdPath, "css-loader", "css_theme.py");
             const themePyContents = fs.readFileSync(themePyPath, 'utf8');
