@@ -11,7 +11,6 @@ jobs:
       contents: write
     runs-on: ubuntu-20.04
 
-    if: contains(github.ref, "release")
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -27,7 +26,7 @@ jobs:
           ref: main
 
       - name: Check DeckThemes API
-        uses: actions/github-script@v3
+        uses: actions/github-script@v6
         with:
           script: |
             const fs = require("fs");
@@ -58,7 +57,7 @@ jobs:
             }
 
             async function getLatestTag() {
-              const unsorted = await github.rest.repos.listTags({
+              const res = await github.rest.repos.listTags({
                 owner: context.repo.owner,
                 repo: context.repo.repo
               });
@@ -74,7 +73,13 @@ jobs:
                 return major || minor || patch;
               }
 
-              return unsorted.sort((v1, v2) => sorter(v1, v2))[0];
+              if (res.status === 200) {
+                const unsorted = res.data.map((entry) => entry.name);
+                return unsorted.sort((v1, v2) => sorter(v1, v2))[0];
+              } else {
+                core.warning(`list repository tags returned a status of ${res.status}`)
+                return [];
+              }
             }
 
 
@@ -105,24 +110,23 @@ jobs:
             const data = await response.json();
 
             //? Check for New Targets
-            const listFromSchema = schema.properties.targets.enum;
+            const listFromSchema = schema.properties.target.enum;
             const listFromApi = Object.keys(data.filters);
             //TODO: check for differences
 
             const listsAreEqual = listFromSchema.every((elem) => listFromApi.includes(elem)) && listFromApi.every((elem) => listFromSchema.includes(elem));
             if (!listsAreEqual) {
               newTargets = true;
-              schema.properties.targets.enum = listFromApi;
+              schema.properties.target.enum = listFromApi;
             }
 
-
-            const mainPyPath = path.join(cwdPath, "css-loader", "SDH-CssLoader", "main.py");
-            const mainPyContents = fs.readFileSync(mainPyPath, 'utf8');
+            const themePyPath = path.join(cwdPath, "css-loader", "css_theme.py");
+            const themePyContents = fs.readFileSync(themePyPath, 'utf8');
             const manifestVersionPattern = /CSS_LOADER_VER = (.*)/;
 
             //? Check for New Manifest Version
             const currentVersion = schema.properties.manifest_version.const;
-            const newVersionStr = mainPyContents.match(manifestVersionPattern)[0];
+            const newVersionStr = themePyContents.match(manifestVersionPattern)[1];
             const newVersion = parseInt(newVersionStr);
 
             if (currentVersion !== newVersion) {
