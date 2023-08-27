@@ -57,7 +57,7 @@ jobs:
             }
 
             async function getLatestTag() {
-              const result = await github.rest.repos.listTags({
+              const res = await github.rest.repos.listTags({
                 owner: context.repo.owner,
                 repo: context.repo.repo
               });
@@ -73,12 +73,12 @@ jobs:
                 return major || minor || patch;
               }
 
-              if (result.status === 200) {
+              if (res.status === 200) {
                 const unsorted = res.data.map((entry) => entry.name);
                 core.info(JSON.stringify(unsorted));
                 return unsorted.sort((v1, v2) => sorter(v1, v2))[0];
               } else {
-                core.warning(`list repository tags returned a status of ${result.status}`)
+                core.warning(`list repository tags returned a status of ${res.status}`)
                 return [];
               }
             }
