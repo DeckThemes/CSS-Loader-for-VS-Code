@@ -75,7 +75,6 @@ jobs:
 
               if (res.status === 200) {
                 const unsorted = res.data.map((entry) => entry.name);
-                core.info(JSON.stringify(unsorted));
                 return unsorted.sort((v1, v2) => sorter(v1, v2))[0];
               } else {
                 core.warning(`list repository tags returned a status of ${res.status}`)
@@ -120,8 +119,6 @@ jobs:
               newTargets = true;
               schema.properties.target.enum = listFromApi;
             }
-
-            const latestTag = await getLatestTag();
 
             const themePyPath = path.join(cwdPath, "css-loader", "css_theme.py");
             const themePyContents = fs.readFileSync(themePyPath, 'utf8');
