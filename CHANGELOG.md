@@ -6,6 +6,11 @@ All notable changes to the `CSS Loader for VS Code` extension will be documented
 
 <!-- replace me with new updates! -->
 
+## v1.7.0
+
+New Features:
+* feat: added schema support for cssloader v2.0.0 ([e9ccd0c](https://github.com/DeckThemes/CSS-Loader-for-VS-Code/commit/e9ccd0c))
+
 ## v1.6.0
 
 New Features:
