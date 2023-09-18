@@ -31,6 +31,10 @@
 			"description": "The name of the theme. Make it short and catchy! (IMPORTANT: Once submitted, this name can not be changed)",
 			"type": "string"
 		},
+		"displayName": {
+			"description": "The display name of the theme. This is what is shown on the store and to users.",
+			"type": "string"
+		},
 		"description": {
 			"description": "A description of the theme. This should explain what it does, and any side effects it has (breaks navigation, etc), as well as any incompatabilities with other themes.",
 			"type": "string"
@@ -44,8 +48,8 @@
 			"type": "string"
 		},
 		"manifest_version": {
-			"description": "The manifest version. This should almost always be the latest version.\n\nLatest Version: 8",
-			"const": 8
+			"description": "The manifest version. This should almost always be the latest version.\n\nLatest Version: 9",
+			"const": 9
 		},
 		"flags": {
 			"description": "A list of flags that modify the behavior of the theme.",
@@ -57,7 +61,8 @@
 						"enum": [
 							"PRESET",
 							"KEEP_DEPENDENCIES",
-							"OPTIONAL_DEPENDENCIES"
+							"OPTIONAL_DEPENDENCIES",
+              "REQUIRE_NAV_PATCH"
 						]
 					}
 				]
@@ -65,29 +70,19 @@
 			"uniqueItems": true
 		},
 		"target": {
-			"description": "A theme target. This helps users tell what the theme styles at a glance.",
-			"enum": [
-				"System-Wide",
-				"Tweak",
-				"Home",
-				"Keyboard",
-				"Other",
-				"Library",
-				"Desktop-Library",
-				"Store",
-				"Desktop",
-				"Snippet",
-				"Profile",
-				"Desktop-Tweak",
-				"Media",
-				"Lock Screen",
-				"Desktop-Store",
-				"Background",
-				"Friends and Chat",
-				"Downloads",
-				"Settings",
-				"Desktop-Friends"
-			]
+			"description": "A theme target or an array of theme targets. These help users tell what the theme styles at a glance.",
+			"oneOf": [
+        {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/definitions/InjectionTargets"
+          }
+        },
+        {
+          "$ref": "#/definitions/ThemeTarget"
+        }
+      ]
 		},
 		"tabs": {
 			"description": "A dictionary of reuseable injection targets, where the key is the label, and the value is an array of injection targets.",
@@ -176,6 +171,31 @@
 	],
 	"additionalProperties": false,
 	"definitions": {
+    "ThemeTarget": {
+      "description": "A theme target. This helps users tell what the theme styles at a glance.",
+			"enum": [
+				"System-Wide",
+				"Tweak",
+				"Home",
+				"Keyboard",
+				"Other",
+				"Library",
+				"Desktop-Library",
+				"Store",
+				"Desktop",
+				"Snippet",
+				"Profile",
+				"Desktop-Tweak",
+				"Media",
+				"Lock Screen",
+				"Desktop-Store",
+				"Background",
+				"Friends and Chat",
+				"Downloads",
+				"Settings",
+				"Desktop-Friends"
+			]
+    },
 		"TabTarget": {
 			"description": "A reuseable injection target.",
 			"type": "array",
