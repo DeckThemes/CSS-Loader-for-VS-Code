@@ -8,7 +8,7 @@
 		"description": "Something to spice up your Steamdeck experience!",
 		"author": "You",
 		"version": "v1.0.0",
-		"manifest_version": 8,
+		"manifest_version": 9,
 		"target": "Home",
 		"tabs": {
 			"default": [

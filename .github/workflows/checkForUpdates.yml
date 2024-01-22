@@ -110,14 +110,14 @@ jobs:
             const data = await response.json();
 
             //? Check for New Targets
-            const listFromSchema = schema.properties.target.enum;
+            const listFromSchema = schema.definitions.ThemeTarget.enum;
             const listFromApi = Object.keys(data.filters);
             //TODO: check for differences
 
             const listsAreEqual = listFromSchema.every((elem) => listFromApi.includes(elem)) && listFromApi.every((elem) => listFromSchema.includes(elem));
             if (!listsAreEqual) {
               newTargets = true;
-              schema.properties.target.enum = listFromApi;
+              schema.definitions.ThemeTarget.enum = listFromApi;
             }
 
             const themePyPath = path.join(cwdPath, "css-loader", "css_theme.py");
@@ -131,6 +131,7 @@ jobs:
 
             if (currentVersion !== newVersion) {
               newManifestVersion = true;
+              schema.default.manifest_version = newVersion;
               schema.properties.manifest_version.description = `The manifest version. This should almost always be the latest version.\n\nLatest Version: ${newVersion}`;
               schema.properties.manifest_version.const = newVersion;
             }
