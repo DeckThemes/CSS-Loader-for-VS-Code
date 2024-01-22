@@ -8,7 +8,7 @@
 		"description": "Something to spice up your Steamdeck experience!",
 		"author": "You",
 		"version": "v1.0.0",
-		"manifest_version": 8,
+		"manifest_version": 9,
 		"target": "Home",
 		"tabs": {
 			"default": [
@@ -31,7 +31,7 @@
 			"description": "The name of the theme. Make it short and catchy! (IMPORTANT: Once submitted, this name can not be changed)",
 			"type": "string"
 		},
-		"displayName": {
+		"display_name": {
 			"description": "The display name of the theme. This is what is shown on the store and to users.",
 			"type": "string"
 		},
@@ -70,13 +70,13 @@
 			"uniqueItems": true
 		},
 		"target": {
-			"description": "A theme target or an array of theme targets. These help users tell what the theme styles at a glance.",
+			"description": "The target(s) for your theme. These help users tell what the theme styles at a glance.",
 			"oneOf": [
         {
           "type": "array",
           "uniqueItems": true,
           "items": {
-            "$ref": "#/definitions/InjectionTargets"
+            "$ref": "#/definitions/ThemeTarget"
           }
         },
         {
