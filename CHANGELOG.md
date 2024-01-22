@@ -6,6 +6,10 @@ All notable changes to the `CSS Loader for VS Code` extension will be documented
 
 <!-- replace me with new updates! -->
 
+## v1.8.0
+
+
+
 ## v1.7.0
 
 New Features:
